@@ -1,52 +1,38 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 
-from database import load_users, save_users
+from database import create_user, get_user
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user = update.effective_user
 
-    users = load_users()
+    telegram_user = update.effective_user
 
-    user_id = str(user.id)
+    # Tạo tài khoản nếu chưa có
+    created = create_user(telegram_user)
 
-    if user_id not in users:
+    user = get_user(telegram_user.id)
 
-        users[user_id] = {
-            "name": user.first_name,
-            "username": user.username,
-            "level": 1,
-            "crystal": 0,
-            "gem": 0
-        }
+    if created:
+        message = f"""
+🚀 Chào mừng {user['name']} đến với NasaCore!
 
-        save_users(users)
+🎉 Tài khoản của bạn đã được tạo thành công.
 
-        await update.message.reply_text(
-            f"""🚀 Chào mừng {user.first_name}!
+⭐ Level: {user['level']}
+💎 Crystal: {user['crystal']}
+💰 Gem: {user['gem']}
 
-Tài khoản NasaCore đã được tạo.
-
-⭐ Level: 1
-💎 Gem: 0
-🔷 Crystal: 0
+Chúc bạn có những chuyến khám phá không gian thú vị!
 """
-        )
 
     else:
+        message = f"""
+👋 Chào mừng trở lại {user['name']}!
 
-        player = users[user_id]
-
-        await update.message.reply_text(
-            f"""👋 Chào mừng quay lại!
-
-👤 {player["name"]}
-
-⭐ Level: {player["level"]}
-
-💎 Gem: {player["gem"]}
-
-🔷 Crystal: {player["crystal"]}
+⭐ Level: {user['level']}
+💎 Crystal: {user['crystal']}
+💰 Gem: {user['gem']}
 """
-        )
+
+    await update.message.reply_text(message)
