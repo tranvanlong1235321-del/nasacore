@@ -1,0 +1,7 @@
+{
+    "exchange_rate": 100,
+    "withdraw_level": 10,
+    "withdraw_min": 50000,
+    "daily_scan_limit": 30,
+    "daily_ads_limit": 50
+}
